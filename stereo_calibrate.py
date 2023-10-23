@@ -10,17 +10,14 @@ def main():
     Main function to handle stereo camera calibration.
     """
 
-    PATTERN_SIZE = (4, 7)
+    PATTERN_SIZE = (7, 11)
     CALIBRATION_DATA_FILENAME = "stereo_calibration_data.json"
 
     calibrator = StereoPreCalibration(PATTERN_SIZE, CALIBRATION_DATA_FILENAME)
-    imagesl = sorted(glob.glob("frames/D2/*.png"))  # 左目
-    imagesr = sorted(glob.glob("frames/J2/*.png"))  # 右目
+    imagesl = sorted(glob.glob("data/imgs/leftcamera/*.png"))  # 左目
+    imagesr = sorted(glob.glob("data/imgs/rightcamera/*.png"))  # 右目
     # 左目,右目のセット
-    stereo_images = sorted(glob.glob("frames/synched/*.png"))
-    image_set = list(
-        zip(stereo_images[: len(stereo_images) // 2], stereo_images[len(stereo_images) // 2 :])
-    )
+    image_set = list(zip(imagesl, imagesr))
 
     calibrator.calibrate_camera(imagesl, "l")
     calibrator.calibrate_camera(imagesr, "r")
@@ -104,7 +101,6 @@ class StereoPreCalibration:
             gray_r = cv2.cvtColor(im_r, cv2.COLOR_BGR2GRAY)
             found_l, corners_l = cv2.findChessboardCorners(gray_l, self.pattern_size, None)
             found_r, corners_r = cv2.findChessboardCorners(gray_r, self.pattern_size, None)
-            print(found_l, found_r)
             if found_l and found_r:
                 objpoints.append(self.objp)
                 cv2.cornerSubPix(gray_l, corners_l, (11, 11), (-1, -1), self.criteria)
